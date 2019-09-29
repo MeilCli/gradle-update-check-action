@@ -1,0 +1,27 @@
+name: 'gradle update checker'
+description: 'gradle maven new packeage version checker'
+author: 'MeilCli'
+branding:
+  icon: arrow-up
+  color: blue
+inputs:
+  build_gradle_files:
+    description: 'target root build.gradle files'
+  skip_plugin_dependency:
+    description: 'skip automally add dependency of gradle-versions-plugin'
+  revision:
+    description: 'version check revision'
+  output_text_style:
+    description: 'output text style, value: short or long'
+    required: true
+    default: "short"
+outputs:
+  has_maven_update:
+    description: 'has new package version information'
+  maven_update_text:
+    description: 'new package version information text'
+  maven_update_json:
+    description: 'new package version information json'
+runs:
+  using: 'node12'
+  main: 'lib/main.js'

@@ -57,7 +57,7 @@ jobs:
   - version check revision
   - more information? see [ben-manes/gradle-versions-plugin](https://github.com/ben-manes/gradle-versions-plugin)
   - value: `release` or `milestone` or `integration`, default: `release`
-- output_text_style
+- `output_text_style`
   - optional
   - output text style
   - value: `short` or `long`, default: `short`

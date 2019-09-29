@@ -6,6 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as process from "process";
 import { OutdatedPackage, toOutdatedPackages } from "./json";
+import { ExecOptions } from "@actions/exec/lib/interfaces";
 
 const buildGradleDependency = `buildscript {
     repositories { jcenter() }
@@ -69,6 +70,7 @@ async function executeOutdated(
     try {
         if (option.skipPluginDependency == false) {
             buildGradleFileClone = await copyBuildGradle(buildGradleFile);
+            core.info(`escape file to ${buildGradleFileClone}`);
             fs.appendFile(
                 buildGradleFile,
                 `${os.EOL}${buildGradleDependency}`,
@@ -97,13 +99,16 @@ async function executeOutdated(
 
         const result: OutdatedPackage[] = [];
 
-        fs.readFile(resultPath, (err, data) => {
-            if (err != null) {
-                toOutdatedPackages(data.toString()).forEach(x =>
-                    result.push(x)
-                );
+        const execOption: ExecOptions = {};
+        let stdout = "";
+        execOption.listeners = {
+            stdout: (data: Buffer) => {
+                stdout += data.toString();
             }
-        });
+        };
+        await exec.exec("cat", [resultPath], execOption);
+
+        toOutdatedPackages(stdout).forEach(x => result.push(x));
 
         return result;
     } finally {
@@ -112,6 +117,7 @@ async function executeOutdated(
             buildGradleFileClone != null
         ) {
             await io.mv(buildGradleFileClone, buildGradleFile, { force: true });
+            core.info(`restore file: ${buildGradleFile}`);
         }
     }
 }

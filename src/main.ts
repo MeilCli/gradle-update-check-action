@@ -52,19 +52,10 @@ function getOption(): Option {
 
 async function copyBuildGradle(buildGradleFile: string): Promise<string> {
     const directory = path.dirname(path.resolve(buildGradleFile));
-
-    let buildGradleFileClone: string | null = null;
-    let count = 1;
-    while (buildGradleFileClone == null) {
-        const newFile = path.join(directory, `build.gradle.${count}.txt`);
-        fs.stat(newFile, error => {
-            if (error != null && error.code === "ENOENT") {
-                buildGradleFileClone = newFile;
-            }
-        });
-        count += 1;
-    }
-
+    const buildGradleFileClone = path.join(
+        directory,
+        `build.gradle.escape.txt`
+    );
     const resultPath = path.relative(process.cwd(), buildGradleFileClone);
     await io.cp(buildGradleFile, resultPath);
     return resultPath;

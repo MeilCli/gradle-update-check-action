@@ -1,5 +1,5 @@
 name: 'gradle update checker'
-description: 'gradle maven new packeage version checker'
+description: 'gradle maven new package version checker'
 author: 'MeilCli'
 branding:
   icon: arrow-up

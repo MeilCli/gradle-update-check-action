@@ -30,7 +30,7 @@ jobs:
         java-version: 1.8
     - name: Grant permission
       run: chmod +x gradlew
-    - uses: MeilCli/gradle-update-check-action@v1
+    - uses: MeilCli/gradle-update-check-action@v2
       id: outdated
     - uses: 8398a7/action-slack@v2
       if: steps.outdated.outputs.has_maven_update != 'false'

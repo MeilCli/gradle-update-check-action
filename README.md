@@ -1,6 +1,6 @@
 # gradle-update-check-action
 ![](https://github.com/MeilCli/gradle-update-check-action/workflows/CI/badge.svg)  
-JavaScript based gradle maven new package version check action for GitHub Actions.
+gradle maven new package version check action for GitHub Actions.
 
 ## Thanks
 This action is using [ben-manes/gradle-versions-plugin](https://github.com/ben-manes/gradle-versions-plugin).
@@ -30,7 +30,7 @@ jobs:
         java-version: 1.8
     - name: Grant permission
       run: chmod +x gradlew
-    - uses: MeilCli/gradle-update-check-action@v2
+    - uses: MeilCli/gradle-update-check-action@v3
       id: outdated
     - uses: 8398a7/action-slack@v2
       if: steps.outdated.outputs.has_maven_update != 'false'
@@ -42,6 +42,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
+You can also pin to a [specific release](https://github.com/MeilCli/gradle-update-check-action/releases) version in the format `@v3.x.x`
 
 ## input
 - `build_gradle_files`

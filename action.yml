@@ -14,7 +14,7 @@ inputs:
   output_text_style:
     description: 'output text style, value: short or long'
     required: true
-    default: "short"
+    default: 'short'
 outputs:
   has_maven_update:
     description: 'has new package version information'

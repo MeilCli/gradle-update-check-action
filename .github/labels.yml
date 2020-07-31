@@ -1,27 +1,27 @@
 - name: Action
   color: 92efb4
-  description: ""
+  description: ''
 - name: BreakingChange
   color: db3b4d
-  description: ""
+  description: ''
 - name: Bug
   color: d73a4a
   description: Something isn't working
 - name: Dependencies
   color: abc43e
-  description: ""
+  description: ''
 - name: Development
   color: fef2c0
-  description: ""
+  description: ''
 - name: Documentation
   color: 1d76db
-  description: ""
+  description: ''
 - name: Feature
   color: a2eeef
   description: New feature or request
 - name: Maintenance
   color: 4d6eb7
-  description: ""
+  description: ''
 - name: Question
   color: d876e3
   description: Further information is requested

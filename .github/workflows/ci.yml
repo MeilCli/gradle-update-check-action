@@ -24,8 +24,9 @@ jobs:
         if: github.event_name != 'pull_request'
       - name: Create Pull Request
         if: github.event_name != 'pull_request'
-        uses: peter-evans/create-pull-request@v2
+        uses: peter-evans/create-pull-request@v3
         with:
+          token: ${{ secrets.MEILCLI_BOT }}
           commit-message: 'update actions'
           title: 'update actions'
           labels: 'Action'

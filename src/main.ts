@@ -25,13 +25,12 @@ function getOption(): Option {
     let buildGradleFiles: string[] | null = core
         .getInput("build_gradle_files")
         .split(os.EOL)
-        .map(x => x.trim());
+        .map((x) => x.trim());
     if (buildGradleFiles.length == 1 && buildGradleFiles[0].length == 0) {
         buildGradleFiles = null;
     }
 
-    const skipPluginDependency: boolean =
-        core.getInput("skip_plugin_dependency") == "true" ? true : false;
+    const skipPluginDependency: boolean = core.getInput("skip_plugin_dependency") == "true" ? true : false;
     const revisionValue = core.getInput("revision");
     let revision: "release" | "milestone" | "integration";
     if (revisionValue == "integration") {
@@ -47,55 +46,39 @@ function getOption(): Option {
         buildGradleFiles: buildGradleFiles,
         skipPluginDependency: skipPluginDependency,
         revision: revision,
-        outputTextStyle: outputTextStyle == "long" ? "long" : "short"
+        outputTextStyle: outputTextStyle == "long" ? "long" : "short",
     };
 }
 
 async function copyBuildGradle(buildGradleFile: string): Promise<string> {
     const directory = path.dirname(path.resolve(buildGradleFile));
-    const buildGradleFileClone = path.join(
-        directory,
-        `build.gradle.escape.txt`
-    );
+    const buildGradleFileClone = path.join(directory, `build.gradle.escape.txt`);
     const resultPath = path.relative(process.cwd(), buildGradleFileClone);
     await io.cp(buildGradleFile, resultPath);
     return resultPath;
 }
 
-async function executeOutdated(
-    buildGradleFile: string,
-    option: Option
-): Promise<OutdatedPackage[]> {
+async function executeOutdated(buildGradleFile: string, option: Option): Promise<OutdatedPackage[]> {
     let buildGradleFileClone: string | null = null;
     try {
         if (option.skipPluginDependency == false) {
             buildGradleFileClone = await copyBuildGradle(buildGradleFile);
             core.info(`escape file to ${buildGradleFileClone}`);
-            fs.appendFile(
-                buildGradleFile,
-                `${os.EOL}${buildGradleDependency}`,
-                e => {
-                    if (e != null) {
-                        throw e;
-                    }
+            fs.appendFile(buildGradleFile, `${os.EOL}${buildGradleDependency}`, (e) => {
+                if (e != null) {
+                    throw e;
                 }
-            );
+            });
         }
-        const gradleCommand =
-            process.platform === "win32" ? "gradlew" : "./gradlew";
+        const gradleCommand = process.platform === "win32" ? "gradlew" : "./gradlew";
 
         await exec.exec(gradleCommand, [
             "dependencyUpdates",
             `-Drevision=${option.revision}`,
-            "-DoutputFormatter=json"
+            "-DoutputFormatter=json",
         ]);
 
-        const resultPath = path.join(
-            path.dirname(buildGradleFile),
-            "build",
-            "dependencyUpdates",
-            "report.json"
-        );
+        const resultPath = path.join(path.dirname(buildGradleFile), "build", "dependencyUpdates", "report.json");
 
         const result: OutdatedPackage[] = [];
 
@@ -104,28 +87,22 @@ async function executeOutdated(
         execOption.listeners = {
             stdout: (data: Buffer) => {
                 stdout += data.toString();
-            }
+            },
         };
         await exec.exec("cat", [resultPath], execOption);
 
-        toOutdatedPackages(stdout).forEach(x => result.push(x));
+        toOutdatedPackages(stdout).forEach((x) => result.push(x));
 
         return result;
     } finally {
-        if (
-            option.skipPluginDependency == false &&
-            buildGradleFileClone != null
-        ) {
+        if (option.skipPluginDependency == false && buildGradleFileClone != null) {
             await io.mv(buildGradleFileClone, buildGradleFile, { force: true });
             core.info(`restore file: ${buildGradleFile}`);
         }
     }
 }
 
-function convertToOutputText(
-    outdatedPackages: OutdatedPackage[],
-    option: Option
-): string {
+function convertToOutputText(outdatedPackages: OutdatedPackage[], option: Option): string {
     if (option.outputTextStyle == "short") {
         let result = "";
         for (const outdatedPackage of outdatedPackages) {
@@ -154,19 +131,16 @@ async function run() {
         const result: OutdatedPackage[] = [];
         if (option.buildGradleFiles == null) {
             const packages = await executeOutdated("build.gradle", option);
-            packages.forEach(x => result.push(x));
+            packages.forEach((x) => result.push(x));
         } else {
             for (const buildGradleFile of option.buildGradleFiles) {
                 const packages = await executeOutdated(buildGradleFile, option);
-                packages.forEach(x => result.push(x));
+                packages.forEach((x) => result.push(x));
             }
         }
 
         const outputText = convertToOutputText(result, option);
-        core.setOutput(
-            "has_maven_update",
-            result.length == 0 ? "false" : "true"
-        );
+        core.setOutput("has_maven_update", result.length == 0 ? "false" : "true");
         core.setOutput("maven_update_text", outputText);
         core.setOutput("maven_update_json", JSON.stringify(result));
     } catch (error) {

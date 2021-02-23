@@ -51,7 +51,7 @@ export function toOutdatedPackages(value: string): OutdatedPackage[] {
             name: `${reportPackage.group}:${reportPackage.name}`,
             current: reportPackage.version,
             latest: latest,
-            projectUrl: reportPackage.projectUrl
+            projectUrl: reportPackage.projectUrl,
         });
     }
 

@@ -144,7 +144,9 @@ async function run() {
         core.setOutput("maven_update_text", outputText);
         core.setOutput("maven_update_json", JSON.stringify(result));
     } catch (error) {
-        core.setFailed(error.message);
+        if (error instanceof Error) {
+            core.setFailed(error.message);
+        }
     }
 }
 

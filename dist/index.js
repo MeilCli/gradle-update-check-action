@@ -70,15 +70,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec = __importStar(__nccwpck_require__(514));
@@ -121,54 +112,50 @@ function getOption() {
         outputTextStyle: outputTextStyle == "long" ? "long" : "short",
     };
 }
-function copyBuildGradle(buildGradleFile) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const directory = path.dirname(path.resolve(buildGradleFile));
-        const buildGradleFileClone = path.join(directory, `build.gradle.escape.txt`);
-        const resultPath = path.relative(process.cwd(), buildGradleFileClone);
-        yield io.cp(buildGradleFile, resultPath);
-        return resultPath;
-    });
+async function copyBuildGradle(buildGradleFile) {
+    const directory = path.dirname(path.resolve(buildGradleFile));
+    const buildGradleFileClone = path.join(directory, `build.gradle.escape.txt`);
+    const resultPath = path.relative(process.cwd(), buildGradleFileClone);
+    await io.cp(buildGradleFile, resultPath);
+    return resultPath;
 }
-function executeOutdated(buildGradleFile, option) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let buildGradleFileClone = null;
-        try {
-            if (option.skipPluginDependency == false) {
-                buildGradleFileClone = yield copyBuildGradle(buildGradleFile);
-                core.info(`escape file to ${buildGradleFileClone}`);
-                fs.appendFile(buildGradleFile, `${os.EOL}${buildGradleDependency}`, (e) => {
-                    if (e != null) {
-                        throw e;
-                    }
-                });
-            }
-            const gradleCommand = process.platform === "win32" ? "gradlew" : "./gradlew";
-            yield exec.exec(gradleCommand, [
-                "dependencyUpdates",
-                `-Drevision=${option.revision}`,
-                "-DoutputFormatter=json",
-            ]);
-            const resultPath = path.join(path.dirname(buildGradleFile), "build", "dependencyUpdates", "report.json");
-            const result = [];
-            const execOption = {};
-            let stdout = "";
-            execOption.listeners = {
-                stdout: (data) => {
-                    stdout += data.toString();
-                },
-            };
-            yield exec.exec("cat", [resultPath], execOption);
-            (0, json_1.toOutdatedPackages)(stdout).forEach((x) => result.push(x));
-            return result;
+async function executeOutdated(buildGradleFile, option) {
+    let buildGradleFileClone = null;
+    try {
+        if (option.skipPluginDependency == false) {
+            buildGradleFileClone = await copyBuildGradle(buildGradleFile);
+            core.info(`escape file to ${buildGradleFileClone}`);
+            fs.appendFile(buildGradleFile, `${os.EOL}${buildGradleDependency}`, (e) => {
+                if (e != null) {
+                    throw e;
+                }
+            });
         }
-        finally {
-            if (option.skipPluginDependency == false && buildGradleFileClone != null) {
-                yield io.mv(buildGradleFileClone, buildGradleFile, { force: true });
-                core.info(`restore file: ${buildGradleFile}`);
-            }
+        const gradleCommand = process.platform === "win32" ? "gradlew" : "./gradlew";
+        await exec.exec(gradleCommand, [
+            "dependencyUpdates",
+            `-Drevision=${option.revision}`,
+            "-DoutputFormatter=json",
+        ]);
+        const resultPath = path.join(path.dirname(buildGradleFile), "build", "dependencyUpdates", "report.json");
+        const result = [];
+        const execOption = {};
+        let stdout = "";
+        execOption.listeners = {
+            stdout: (data) => {
+                stdout += data.toString();
+            },
+        };
+        await exec.exec("cat", [resultPath], execOption);
+        (0, json_1.toOutdatedPackages)(stdout).forEach((x) => result.push(x));
+        return result;
+    }
+    finally {
+        if (option.skipPluginDependency == false && buildGradleFileClone != null) {
+            await io.mv(buildGradleFileClone, buildGradleFile, { force: true });
+            core.info(`restore file: ${buildGradleFile}`);
         }
-    });
+    }
 }
 function convertToOutputText(outdatedPackages, option) {
     if (option.outputTextStyle == "short") {
@@ -192,32 +179,30 @@ function convertToOutputText(outdatedPackages, option) {
         return result;
     }
 }
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const option = yield getOption();
-            const result = [];
-            if (option.buildGradleFiles == null) {
-                const packages = yield executeOutdated("build.gradle", option);
+async function run() {
+    try {
+        const option = await getOption();
+        const result = [];
+        if (option.buildGradleFiles == null) {
+            const packages = await executeOutdated("build.gradle", option);
+            packages.forEach((x) => result.push(x));
+        }
+        else {
+            for (const buildGradleFile of option.buildGradleFiles) {
+                const packages = await executeOutdated(buildGradleFile, option);
                 packages.forEach((x) => result.push(x));
             }
-            else {
-                for (const buildGradleFile of option.buildGradleFiles) {
-                    const packages = yield executeOutdated(buildGradleFile, option);
-                    packages.forEach((x) => result.push(x));
-                }
-            }
-            const outputText = convertToOutputText(result, option);
-            core.setOutput("has_maven_update", result.length == 0 ? "false" : "true");
-            core.setOutput("maven_update_text", outputText);
-            core.setOutput("maven_update_json", JSON.stringify(result));
         }
-        catch (error) {
-            if (error instanceof Error) {
-                core.setFailed(error.message);
-            }
+        const outputText = convertToOutputText(result, option);
+        core.setOutput("has_maven_update", result.length == 0 ? "false" : "true");
+        core.setOutput("maven_update_text", outputText);
+        core.setOutput("maven_update_json", JSON.stringify(result));
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.setFailed(error.message);
         }
-    });
+    }
 }
 run();
 

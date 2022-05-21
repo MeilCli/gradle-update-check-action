@@ -1,5 +1,5 @@
 # gradle-update-check-action
-![](https://github.com/MeilCli/gradle-update-check-action/workflows/CI/badge.svg)  
+[![CI-Master](https://github.com/MeilCli/gradle-update-check-action/actions/workflows/ci-master.yml/badge.svg)](https://github.com/MeilCli/gradle-update-check-action/actions/workflows/ci-master.yml)  
 gradle maven new package version check action for GitHub Actions.
 
 ## Thanks

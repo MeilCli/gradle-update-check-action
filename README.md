@@ -72,8 +72,11 @@ You can also pin to a [specific release](https://github.com/MeilCli/gradle-updat
 - `maven_update_json`
   - new package version information json
 
-## Contributing
+## Contributes
+[<img src="https://gist.github.com/MeilCli/d52f6f6978c53889b76bf5ab35478baf/raw/99289e53693c8bfa1bb50361772e95f95bf62e76/metrics_contributors.svg">](https://github.com/MeilCli/gradle-update-check-action/graphs/contributors)
+
+### Could you want to contribute?
 see [Contributing.md](./.github/CONTRIBUTING.md)
 
 ## License
-[MIT License](LICENSE).
+[<img src="https://gist.github.com/MeilCli/d52f6f6978c53889b76bf5ab35478baf/raw/99289e53693c8bfa1bb50361772e95f95bf62e76/metrics_licenses.svg">](LICENSE)

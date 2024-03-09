@@ -23,5 +23,5 @@ outputs:
   maven_update_json:
     description: 'new package version information json'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

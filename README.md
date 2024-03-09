@@ -24,13 +24,13 @@ jobs:
   maven:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
       with:
         java-version: 1.8
     - name: Grant permission
       run: chmod +x gradlew
-    - uses: MeilCli/gradle-update-check-action@v3
+    - uses: MeilCli/gradle-update-check-action@v4
       id: outdated
     - uses: 8398a7/action-slack@v2
       if: steps.outdated.outputs.has_maven_update != 'false'
@@ -42,7 +42,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
-You can also pin to a [specific release](https://github.com/MeilCli/gradle-update-check-action/releases) version in the format `@v3.x.x`
+You can also pin to a [specific release](https://github.com/MeilCli/gradle-update-check-action/releases) version in the format `@v4.x.x`
 
 ## input
 - `build_gradle_files`

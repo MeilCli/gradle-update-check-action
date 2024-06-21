@@ -7,7 +7,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toOutdatedPackages = void 0;
+exports.toOutdatedPackages = toOutdatedPackages;
 function toOutdatedPackages(value) {
     if (value.length == 0) {
         return [];
@@ -37,7 +37,6 @@ function toOutdatedPackages(value) {
     }
     return result;
 }
-exports.toOutdatedPackages = toOutdatedPackages;
 
 
 /***/ }),
